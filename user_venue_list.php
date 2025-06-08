@@ -128,19 +128,21 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-     <link rel="stylesheet" href="/ventech_locator/css/user_venue_list.css">
+     <link rel="stylesheet" href="/ventech_locator/css/client_map.css">
 
-    
+    <style>
+       
+    </style>
 </head>
 <body>
 
-    <nav class="bg-indigo-700 p-4 text-white shadow-lg fixed w-full top-0 z-10">
+    <nav class="bg-white-700 p-4 text-black shadow-lg fixed w-full top-0 z-10">
         <div class="container mx-auto flex justify-between items-center">
             <a href="index.php" class="text-2xl font-bold hover:text-indigo-200 transition-colors">Ventech Locator</a>
             <div class="flex items-center">
                  <?php if ($loggedInUserId): // Show notification icon only if logged in ?>
                      <div class="notification-icon-container">
-                         <a href="user_notification_list.php" class="text-white hover:text-indigo-200 transition-colors" title="View Notifications">
+                         <a href="user_notification_list.php" class="text-black hover:text-indigo-200 transition-colors" title="View Notifications">
                               <i class="fas fa-bell text-xl"></i>
                          </a>
                          <?php if ($unread_notification_count > 0): ?>
@@ -152,15 +154,15 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
                  <?php endif; ?>
 
                 <?php if ($loggedInUserId): ?>
-                     <span class="mr-4 hidden sm:inline text-indigo-100">Welcome, <strong class="font-semibold text-white"><?= htmlspecialchars($loggedInUsername ?? 'User') ?></strong>!</span>
-                     <a href="user_logout.php" class="bg-white text-indigo-700 hover:bg-gray-200 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm flex items-center">
+                     <span class="mr-4 hidden sm:inline text-indigo-100">Welcome, <strong class="font-semibold text-black"><?= htmlspecialchars($loggedInUsername ?? 'User') ?></strong>!</span>
+                     <a href="user_logout.php" class="bg-black text-indigo-700 hover:bg-gray-200 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm flex items-center">
                          <i class="fas fa-sign-out-alt mr-1"></i> Logout
                      </a>
                 <?php else: ?>
-                     <a href="javascript:void(0);" onclick="openUserLoginModal()" class="bg-white text-indigo-700 hover:bg-gray-200 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm mr-2">
+                     <a href="client/client_login.php" class="bg-black text-indigo-700 hover:bg-gray-200 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm mr-2">
                          <i class="fas fa-sign-in-alt mr-1"></i> Login
                      </a>
-                     <a href="javascript:void(0);" onclick="openUserSignupModal()" class="bg-indigo-500 text-white hover:bg-indigo-600 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm">
+                     <a href="client/client_register.php" class="bg-indigo-500 text-black hover:bg-indigo-600 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm">
                          <i class="fas fa-user-plus mr-1"></i> Register
                      </a>
                 <?php endif; ?>
@@ -209,26 +211,6 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
 
         <div class="map-container-right">
             <div id="map"></div>
-        </div>
-    </div>
-
-    <!-- User Login Modal -->
-    <div id="userLoginModal" class="modal-overlay">
-        <div class="modal-content">
-            <button type="button" onclick="closeUserLoginModal()" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl font-bold z-50">
-                ×
-            </button>
-            <iframe id="userLoginIframe" src="" class="modal-iframe" title="User Login Form"></iframe>
-        </div>
-    </div>
-
-    <!-- User Signup Modal -->
-    <div id="userSignupModal" class="modal-overlay">
-        <div class="modal-content">
-            <button type="button" onclick="closeUserSignupModal()" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl font-bold z-50">
-                ×
-            </button>
-            <iframe id="userSignupIframe" src="" class="modal-iframe" title="User Signup Form"></iframe>
         </div>
     </div>
 
@@ -702,97 +684,6 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
                        .replace(/'/g, '&#039;');
          }
 
-        // --- User Login/Signup Modal Logic ---
-        const userLoginModal = document.getElementById('userLoginModal');
-        const userLoginIframe = document.getElementById('userLoginIframe');
-        const userSignupModal = document.getElementById('userSignupModal');
-        const userSignupIframe = document.getElementById('userSignupIframe');
-
-        // Function to open the user login modal
-        window.openUserLoginModal = function(redirectUrl = '') {
-            let src = '/ventech_locator/users/user_login.php';
-            if (redirectUrl) {
-                src += '?redirect=' + encodeURIComponent(redirectUrl);
-            }
-            userLoginIframe.src = src;
-            userLoginModal.classList.add('visible');
-            userLoginModal.classList.remove('hidden');
-            // Ensure other modals are closed if open
-            closeUserSignupModal();
-        };
-
-        // Function to close the user login modal
-        window.closeUserLoginModal = function() {
-            userLoginModal.classList.remove('visible');
-            userLoginModal.classList.add('hidden');
-            userLoginIframe.src = ''; // Clear iframe content
-        };
-
-        // Function to open the user signup modal
-        window.openUserSignupModal = function() {
-            userSignupIframe.src = '/ventech_locator/users/user_signup.php';
-            userSignupModal.classList.add('visible');
-            userSignupModal.classList.remove('hidden');
-            // Ensure other modals are closed if open
-            closeUserLoginModal();
-        };
-
-        // Function to close the user signup modal
-        window.closeUserSignupModal = function() {
-            userSignupModal.classList.remove('visible');
-            userSignupModal.classList.add('hidden');
-            userSignupIframe.src = ''; // Clear iframe content
-        };
-
-        // Close user login modal when clicking outside the content
-        userLoginModal.addEventListener('click', function(event) {
-            if (event.target === userLoginModal) {
-                closeUserLoginModal();
-            }
-        });
-
-        // Close user login modal on Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && userLoginModal.classList.contains('visible')) {
-                closeUserLoginModal();
-            }
-        });
-
-        // Close user signup modal when clicking outside the content
-        userSignupModal.addEventListener('click', function(event) {
-            if (event.target === userSignupModal) {
-                closeUserSignupModal();
-            }
-        });
-
-        // Close user signup modal on Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && userSignupModal.classList.contains('visible')) {
-                closeUserSignupModal();
-            }
-        });
-
-        // Listen for messages from the iframe (user_login.php, user_signup.php)
-        window.addEventListener('message', function(event) {
-            const message = event.data;
-
-            if (message.type === 'loginSuccess' || message.type === 'signupSuccess') {
-                // Reload the parent page to reflect login/signup status
-                window.location.reload();
-            } else if (message.type === 'loginError' || message.type === 'signupError') {
-                // Optionally display an error message on the parent page
-                const errorMessageBox = document.createElement('div');
-                errorMessageBox.className = 'fixed inset-0 bg-red-600 bg-opacity-50 flex items-center justify-center z-50';
-                errorMessageBox.innerHTML = `
-                    <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-                        <p class="text-lg font-semibold mb-4 text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>Authentication Failed</p>
-                        <p class="text-gray-700 mb-4">${message.error || 'An unexpected error occurred.'}</p>
-                        <button type="button" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600" onclick="this.closest('.fixed').remove();">OK</button>
-                    </div>
-                `;
-                document.body.appendChild(errorMessageBox);
-            }
-        });
 
     </script>
 </body>
