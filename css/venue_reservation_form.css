@@ -1,0 +1,329 @@
+ @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0; /* Remove default body margin */
+            padding: 0; /* Remove default body padding */
+            /* Background handled by the main div */
+        }
+        /* Custom focus ring color - Adjusted for dark background */
+        input:focus, select:focus, textarea:focus {
+            --tw-ring-color: #a88c5a; /* Match the button color from index.html */
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+             box-shadow : var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+             border-color : #a88c5a; /* Match the button color from index.html */
+        }
+        /* Style for icons inside inputs - Adjusted for dark background */
+        .input-icon-container {  position : relative; }
+        /* Adjusted icon size */
+        .input-icon {  position : absolute;  left : 0.5rem;  top : 50%;  transform : translateY(-50%);  color : #9ca3af; /* gray-400 */  pointer-events : none; font-size: 0.75rem; /* text-xs */ }
+        /* Adjust padding for icon - Reduced padding */
+        input[type="text"].pl-10,
+        input[type="email"].pl-10,
+        input[type="tel"].pl-10,
+        input[type="date"].pl-10,
+        input[type="time"].pl-10,
+        select.pl-10,
+        textarea.pl-10 {  padding-left : 2rem; /* Reduced from 2.5rem */ }
+        /* Ensure space for default browser icons if needed */
+        input[type="date"], input[type="time"] {  padding-right : 0.5rem; }
+        /* Adjust textarea icon position - Adjusted for smaller padding */
+        textarea.pl-10 + .input-icon {  top : 0.5rem;  transform : translateY(0); }
+
+        /* Section styling - Adjusted for dark background */
+        .form-section {
+             background-color : #2a2a2a; /* Darker background */
+             padding : 1rem; /* p-4, Reduced from 1.5rem */
+             border-radius : 0.5rem; /* rounded-lg */
+             box-shadow : 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); /* shadow-md */
+             margin-bottom : 1rem; /* mb-4, Reduced from 1.5rem */
+             border : 1px solid #3a3a3a; /* Darker border */
+             color: #d1d5db; /* Light gray text */
+        }
+        /* Adjusted section title size */
+        .form-section-title {
+             font-size : 1rem; /* text-base, Reduced from 1.125rem */
+             font-weight : 600; /* font-semibold */
+             color : #f3f4f6; /* Lighter gray text */
+             margin-bottom : 0.75rem; /* mb-3, Reduced from 1rem */
+             padding-bottom : 0.5rem; /* pb-2 */
+             border-bottom : 1px solid #3a3a3a; /* Darker border */
+        }
+         /* Adjusted label font size */
+         .form-section label {
+             color: #9ca3af; /* Gray 400 for labels */
+             font-size: 0.75rem; /* text-xs */
+         }
+         /* Adjusted input font size and padding */
+         .form-section input[type="text"],
+         .form-section input[type="email"],
+         .form-section input[type="tel"],
+         .form-section input[type="date"],
+         .form-section input[type="time"],
+         .form-section select,
+         .form-section textarea {
+             background-color: #1a1a1a; /* Even darker input background */
+             border-color: #3a3a3a; /* Darker border */
+             color: #d1d5db; /* Light gray text */
+             font-size: 0.75rem; /* text-xs */
+             padding: 0.5rem 0.75rem; /* py-2 px-3 */
+         }
+          .form-section input::placeholder,
+          .form-section textarea::placeholder {
+              color: #6b7280; /* Gray 500 for placeholders */
+              font-size: 0.75rem; /* text-xs */
+          }
+
+        /* Enhance mobile number group */
+        .mobile-group select {  border-top-right-radius : 0;  border-bottom-right-radius : 0;  border-right-width : 0; }
+        .mobile-group input {  border-top-left-radius : 0;  border-bottom-left-radius : 0; }
+         /* Adjusted style for the country code span */
+         .mobile-group span {
+             background-color: #1a1a1a; /* Match input background */
+             border-color: #3a3a3a; /* Match input border */
+             color: #d1d5db; /* Match input text */
+             padding: 0.5rem 0.75rem; /* py-2 px-3, Match input padding */
+             font-size: 0.75rem; /* text-xs */
+             display: flex; /* Ensure flex properties apply */
+             align-items: center; /* Center vertically */
+             gap: 0.25rem; /* Reduced gap */
+         }
+         .mobile-group select { /* Style for the select inside the span */
+              background-color: transparent;
+              border: none;
+              padding: 0;
+              margin: 0;
+              color: inherit;
+              font-size: inherit;
+              -webkit-appearance: none; /* Remove default arrow */
+              -moz-appearance: none;
+              appearance: none;
+              cursor: pointer;
+         }
+         .mobile-group select:focus {
+             outline: none;
+             box-shadow: none;
+         }
+
+
+        /* Button styles - Using style from index.html */
+        .btn {
+             display : inline-flex;
+             align-items : center;
+             justify-content : center;
+             padding : 0.5rem 1rem; /* py-2 px-4, Reduced padding */
+             border-radius : 0.25rem; /* rounded */
+             font-weight : 600; /* font-semibold */
+             text-align : center;
+             transition : background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.1s ease;
+             cursor : pointer;
+             box-shadow : 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+             border : 1px solid transparent;
+             font-size: 0.75rem; /* text-xs, Increased slightly from 10px */
+        }
+        .btn:active {
+              transform : translateY(1px); /* Slight press effect */
+        }
+        .btn-primary {
+             background-color : #a88c5a; /* Color from index.html button */
+             color : #1a1a1a; /* Dark text for contrast */
+             border-color : #a88c5a;
+        }
+        .btn-primary:hover {
+             background-color : #8b734a; /* Darker hover color */
+             border-color : #8b734a;
+             box-shadow : 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05); /* shadow-md */
+        }
+         .btn-primary:disabled {
+              background-color : #d4c19f; /* Lighter disabled color */
+              border-color : #d4c19f;
+              color : #6b7280; /* Gray text */
+              cursor : not-allowed;
+              box-shadow : none;
+              transform : none;
+         }
+
+
+        .back-link {
+             display : inline-flex;
+             align-items : center;
+             color : #9ca3af; /* gray-400 */
+             font-weight : 500;
+             text-decoration : none;
+             transition : color 0.2s;
+             font-size: 0.75rem; /* text-xs */
+             margin-bottom: 1rem; /* mb-4, Reduced from 1.5rem */
+        }
+        .back-link:hover {  color : #f3f4f6; /* gray-100 */  text-decoration : none; } /* No underline on hover in index.html */
+        .back-link i {  margin-right : 0.25rem; /* mr-1, Reduced from 0.375rem */ }
+
+        /* Error message styling - Adjusted for dark background and smaller font */
+        .error-message {
+             color : #f87171; /* red-400 */
+             font-size : 0.625rem; /* text-xs */
+             margin-top : 0.125rem; /* mt-0.5 */
+        }
+        /* Input border error state */
+        input.border-red-500, select.border-red-500, textarea.border-red-500 {
+              border-color : #f87171 !important; /* red-400 */
+        }
+        input.border-red-500:focus, select.border-red-500:focus, textarea.border-red-500:focus {
+             --tw-ring-color: #f87171 !important; /* red-400 */
+              border-color : #f87171 !important; /* red-400 */
+        }
+
+        /* Summary section styles - Adjusted for dark background and smaller font */
+        #reservation-summary {
+              border-left : 4px solid #a88c5a; /* Match button color */
+              background-color : #2a2a2a; /* Darker background */
+              color: #d1d5db; /* Light gray text */
+              padding: 1rem; /* p-4 */
+              margin-bottom: 1rem; /* mb-4 */
+        }
+        #reservation-summary .form-section-title {
+             border-bottom-color: #3a3a3a; /* Darker border */
+             font-size: 0.875rem; /* text-sm */
+             margin-bottom: 0.5rem; /* mb-2 */
+        }
+        #reservation-summary .text-gray-700 { /* For labels like 'Date:' */
+             color: #9ca3af; /* gray-400 */
+             font-size: 0.75rem; /* text-xs */
+        }
+        #reservation-summary .text-gray-900 { /* For values like '--' */
+             color: #f3f4f6; /* gray-100 */
+             font-size: 0.75rem; /* text-xs */
+        }
+         #reservation-summary .text-sm { /* For "Estimated Cost" */
+             font-size: 0.75rem; /* text-xs */
+         }
+         #reservation-summary .text-base { /* For "Estimated Total" */
+             font-size: 0.875rem; /* text-sm */
+         }
+        #summary-total-cost {
+              color : #a88c5a; /* Match button color */
+        }
+         /* Hide initially, shown by JS */
+         #reservation-summary.hidden {  display : none; }
+
+         /* Adjust styling for the main container */
+         .main-container {
+             min-height: 100vh; /* Full viewport height */
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             background-image: linear-gradient(to bottom, #c3d1e9, #e6d3d9, #8db7e3);
+             padding: 1rem; /* p-4 */
+         }
+         .content-container {
+             max-width: 80rem; /* Adjusted max width for 2 columns */
+             width: 100%;
+             display: flex; /* Use flex for 2 columns */
+             background-color: #1a1a1a;
+             border-radius: 0.375rem; /* rounded-md */
+             overflow: hidden;
+             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+         }
+         .form-and-summary-column { /* New column for form and summary */
+             width: 50%; /* w-1/2 */
+             padding: 1.5rem; /* p-6 */
+             color: white;
+             overflow-y: auto; /* Add scroll if content is too long */
+             max-height: calc(100vh - 2rem); /* Adjust max height based on padding */
+         }
+         .image-column {
+             width: 50%; /* w-1/2 */
+             position: relative;
+         }
+
+
+          .image-column img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+          }
+          .image-overlay-text {
+              position: absolute;
+              bottom: 1rem; /* bottom-4 */
+              left: 1rem; /* left-4 */
+              color: white;
+              font-size: 0.5rem; /* text-[8px] */
+              font-weight: 400; /* font-normal */
+              line-height: 1.25; /* leading-tight */
+              max-width: 12rem; /* Reduced max width */
+          }
+           .image-overlay-text .font-semibold {
+               font-weight: 600;
+           }
+           .image-overlay-text .text-red-400 { /* Adjusted color */
+               color: #f87171; /* red-400 */
+           }
+
+           /* Responsive adjustments */
+            @media (max-width: 768px) { /* md breakpoint */
+                .content-container {
+                    flex-direction: column; /* Stack columns on mobile */
+                }
+                .form-and-summary-column, .image-column {
+                    width: 100%; /* Full width */
+                     max-height: none; /* Remove max height when stacking */
+                     overflow-y: visible; /* Remove scroll when stacking */
+                }
+                .image-column {
+                     height: 150px; /* Further reduced image height on mobile */
+                }
+                 .image-overlay-text {
+                     bottom: 0.75rem; /* Reduced */
+                     left: 0.75rem; /* Reduced */
+                     font-size: 0.5rem; /* text-[8px] */
+                     max-width: 90%;
+                 }
+                 .back-link {
+                     margin-bottom: 0.75rem; /* Reduced margin */
+                 }
+                 .form-and-summary-column h1 { /* Adjusted main title size on mobile */
+                     font-size: 1.5rem; /* text-2xl */
+                 }
+                 .form-and-summary-column p.text-xs { /* Adjusted description text size on mobile */
+                      font-size: 0.625rem; /* text-[10px] */
+                 }
+                 .form-section-title { /* Adjusted section title size on mobile */
+                     font-size: 0.875rem; /* text-sm */
+                 }
+                 .form-section label,
+                 .form-section input,
+                 .form-section select,
+                 .form-section textarea,
+                 .form-section input::placeholder,
+                 .form-section textarea::placeholder,
+                 .mobile-group span { /* Adjusted input/label/placeholder size on mobile */
+                     font-size: 0.625rem; /* text-[10px] */
+                 }
+                 .input-icon { /* Adjusted icon size on mobile */
+                      font-size: 0.625rem; /* text-[10px] */
+                 }
+                 input[type="text"].pl-10,
+                 input[type="email"].pl-10,
+                 input[type="tel"].pl-10,
+                 input[type="date"].pl-10,
+                 input[type="time"].pl-10,
+                 select.pl-10,
+                 textarea.pl-10 { /* Adjusted padding for icon on mobile */
+                     padding-left: 1.5rem; /* Reduced */
+                 }
+                 textarea.pl-10 + .input-icon { /* Adjusted textarea icon position on mobile */
+                     top: 0.4rem; /* Adjusted */
+                 }
+                 .btn { /* Adjusted button font size on mobile */
+                     font-size: 0.625rem; /* text-[10px] */
+                 }
+                 #reservation-summary .text-sm { /* Adjusted summary text size on mobile */
+                     font-size: 0.625rem; /* text-[10px] */
+                 }
+                  #reservation-summary .text-base { /* Adjusted summary total size on mobile */
+                     font-size: 0.75rem; /* text-xs */
+                  }
+                  .error-message { /* Adjusted error message size on mobile */
+                      font-size: 0.5rem; /* text-[8px] */
+                  }
+            }
+

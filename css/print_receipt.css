@@ -1,0 +1,89 @@
+  body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f3f4f6; /* gray-100 */
+            color: #374151; /* gray-700 */
+        }
+        .receipt-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            line-height: 1.6;
+        }
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e5e7eb; /* gray-200 */
+            padding-bottom: 1rem;
+        }
+        .receipt-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937; /* gray-900 */
+            margin-bottom: 0.5rem;
+        }
+        .receipt-header p {
+            font-size: 0.9rem;
+            color: #6b7280; /* gray-500 */
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937; /* gray-900 */
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+            padding-bottom: 0.5rem;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb; /* gray-200 */
+        }
+        .detail-row:last-of-type {
+            border-bottom: none;
+        }
+        .detail-row span:first-child {
+            font-weight: 500;
+            color: #4b5563; /* gray-700 */
+        }
+        .detail-row span:last-child {
+            color: #1f2937; /* gray-900 */
+        }
+        .total-section {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid #1f2937; /* gray-900 */
+            text-align: right;
+        }
+        .total-section .total-label {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937; /* gray-900 */
+            margin-right: 1rem;
+        }
+        .total-section .total-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ef4444; /* red-500 */
+        }
+        .print-button-container {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        @media print {
+            body {
+                background-color: #ffffff;
+            }
+            .receipt-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            .print-button-container {
+                display: none;
+            }
+        }

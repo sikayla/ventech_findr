@@ -1,0 +1,128 @@
+          @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap"); /* Changed to Roboto Mono */
+    body {
+           font-family     : "Roboto Mono", monospace; /* Applied Roboto Mono font */
+    }
+        /* Optional: Add minor custom styles if needed */
+        .hero-overlay-content {
+                 max-width     : 1200px; /* Limit width of content over hero */
+                 width     : 100%;
+        }
+        .swiper-button-prev,
+    .swiper-button-next {
+             background-color     : rgba(255, 255, 255, 0.7); /* Semi-transparent white */
+             color     : #333; /* Dark arrow color */
+             width     : 30px; /* Adjust size */
+             height     : 30px; /* Adjust size */
+             border-radius     : 50%;
+             transition     : background-color 0.3s ease;
+    }
+    .swiper-button-prev:hover,
+    .swiper-button-next:hover {
+             background-color     : rgba(255, 255, 255, 0.9);
+    }
+    .swiper-button-disabled {
+             opacity     : 0.35;
+             cursor     : auto;
+             pointer-events     : none;
+    }
+
+    /* Custom animation for elements fading in on load */
+    .fade-in {
+         opacity : 0;
+         transform : translateY(20px);
+         animation : fadeInAnimation 0.8s ease-out forwards;
+    }
+
+    @keyframes  fadeInAnimation  {
+        to {
+             opacity : 1;
+             transform : translateY(0);
+        }
+    }
+    /* Removed h2.text-2xl specific style as it's handled by Tailwind */
+
+    /* Delay for sequential animations */
+    .fade-in-1 {  animation-delay : 0.2s; }
+    .fade-in-2 {  animation-delay : 0.4s; }
+    .fade-in-3 {  animation-delay : 0.6s; }
+    .fade-in-4 {  animation-delay : 0.8s; }
+    .fade-in-5 {  animation-delay : 1.0s; }
+    .fade-in-6 {  animation-delay : 1.2s; } /* Added for consistency */
+    .fade-in-7 {  animation-delay : 1.4s; } /* Added for consistency */
+
+    /* Styles for the modal */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .modal-overlay.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-content {
+        position: relative;
+        background-color: white;
+        border-radius: 1rem; /* rounded-3xl */
+        overflow: hidden; /* Ensure no scrollbars on the modal content itself */
+        width: 90%; /* Start with 90% width for responsiveness */
+        max-width: 896px; /* Max-w-4xl from client_login.php's main container */
+        height: auto; /* Let content dictate height */
+        max-height: 650px; /* Adjust as needed to prevent vertical scroll */
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        min-width: 320px; /* Minimum width for mobile */
+        min-height: 500px; /* Minimum height for mobile */
+    }
+
+    /* Adjust iframe size for larger screens if necessary */
+   
+
+    /* New styles for venue cards */
+    .venue-card-link {
+        display: flex; /* Make the anchor tag a flex container */
+        flex-direction: column; /* Stack content vertically */
+        background-color: white;
+        border-radius: 0.75rem; /* rounded-lg */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06); /* shadow-md */
+        overflow: hidden;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        text-decoration: none; /* Remove default underline */
+        color: inherit; /* Inherit text color */
+    }
+
+    .venue-card-link:hover {
+        transform: translateY(-5px); /* Lift effect on hover */
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Larger shadow on hover */
+    }
+    /* Custom checkbox icon style from index (16).html */
+    .fa-check-square {
+      color: #f9d949;
+      font-size: 1rem;
+      margin-right: 0.5rem;
+      flex-shrink: 0;
+    }
+    /* Removed custom margin-left from .items-start to rely on Tailwind gap utilities */
+    /* .items-start {
+        align-items: flex-start;
+        margin-left: 30px;
+    } */

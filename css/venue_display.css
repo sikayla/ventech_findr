@@ -1,0 +1,343 @@
+ body { font-family: 'Montserrat', sans-serif; }
+        #map { height: 350px; width: 100%; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 0; /* Ensure map is below sticky elements */}
+        .swiper-slide img, .swiper-slide video { display: block; width: 100%; height: auto; max-height: 60vh; object-fit: contain; /* Use contain for gallery */ margin: auto; /* Center if smaller */}
+        .swiper-slide { background-color: #f9fafb; } /* Light bg for slides */
+
+        /* --- Enhanced Calendar Styles --- */
+        .calendar { width: 100%; max-width: 450px; /* Adjusted max-width for sidebar */ background-color: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.07); margin: 0 auto 20px auto; /* Centered, with bottom margin */ font-size: 15px; }
+        .calendar .month-header { padding: 12px 15px; font-weight: 600; font-size: 1.15em; border-top-left-radius: 8px; border-top-right-radius: 8liks8px; display: flex; justify-content: space-between; align-items: center; background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0; }
+        .calendar .month-header .month-year-text { flex-grow: 1; text-align: center; }
+        .calendar .month-header button { background: none; border: none; font-size: 1em; cursor: pointer; padding: 8px; color: #334155; transition: color 0.2s; line-height: 1; }
+        .calendar .month-header button:hover { color: #f59e0b; }
+        .calendar .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); padding: 8px 5px; font-weight: 600; color: #475569; background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+        .calendar .weekdays div { text-align: center; font-size: 0.85em; }
+        .calendar .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background-color: #e2e8f0; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; overflow: hidden; }
+        .calendar .days .day-cell { text-align: center; padding: 12px 5px; background-color: #fff; font-size: 0.95em; min-height: 55px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s ease, transform 0.1s ease; position: relative; }
+        .calendar .days .available.future { cursor: pointer; color: #1e40af; font-weight: 500; }
+        .calendar .days .available.future:hover,
+        .calendar .days .available.future:focus { background-color: #eff6ff; transform: scale(1.05); z-index: 5; box-shadow: 0 0 5px rgba(0,0,0,0.1); outline: 2px solid #60a5fa; outline-offset: -2px; border-radius: 3px; }
+        .calendar .days .unavailable { background-color: #fecaca; color: #991b1b; font-weight: 500; cursor: not-allowed; }
+        .calendar .days .past { color: #9ca3af; cursor: not-allowed; background-color: #f9fafb; }
+        .calendar .days .past.unavailable { background-color: #fecaca; opacity: 0.7; }
+        .calendar .days .empty { background-color: #f8fafc; }
+        .calendar .days .selected { background-color: #3b82f6 !important; color: white !important; font-weight: 700; border-radius: 4px; transform: scale(1.05); z-index: 10; box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); }
+
+        /* Header Styles */
+        .venue-header { position: relative; background-color: #333; color: white; overflow: hidden; border-radius: 0px; /* Full width */ margin-bottom: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .venue-header-bg { display: block; width: 100%; height: 55vh; object-fit: cover; opacity: 0.5; /* Dim slightly more */ }
+        .venue-header-bg-iframe { width: 100%; height: 55vh; border: none; display: block; }
+        .venue-header-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 2rem; /* Adjusted padding */
+            background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0));
+        }
+        .venue-header-overlay h1 {
+  font-size: 2em;
+  /* md:font-size: 2.5rem;  -- This is a Tailwind class, remove from CSS */
+  font-weight: 700;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  margin-bottom: 0.5rem;
+}
+
+.venue-header-overlay p {
+  font-size: 0.9em;
+  /*md:font-size: 1rem; -- This is a Tailwind class, remove from CSS */
+  font-weight: 400;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+  opacity: 0.9;
+  display: flex;
+  flex-wrap: wrap; /* Flex wrap for smaller screens */
+  gap: 0.5rem 1.5rem;
+}/* Flex wrap for smaller screens */
+
+        #selected-date-display { margin-top: 5px; text-align: center; font-weight: 500; color: #1d4ed8; min-height: 1.5em; /* Prevent layout shift */ }
+
+        /* Sticky Sidebar Offset */
+        .sticky-sidebar { position: sticky; top: 2rem; /* Adjust based on nav height */ align-self: start; /* Important for sticky */ }
+
+        /* Prose adjustments */
+        .prose { max-width: none; } /* Allow prose to fill container */
+        .prose p { margin-bottom: 1em; }
+        .prose ul { list-style: disc; margin-left: 1.5em; margin-bottom: 1em; }
+        .prose li { margin-bottom: 0.5em; }
+
+        /* Adjusted margin for main content block - REMOVED NEGATIVE MARGIN */
+        .main-content-block { margin-top: 2rem; /* Add positive margin to push content down */ }
+
+        /* Navigation Active State (Example) */
+        nav a.active { color: #f59e0b; font-weight: 600; }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 767px) {
+            .venue-header-overlay h1 {
+                font-size: 1.75rem; /* Smaller heading on mobile */
+            }
+            .venue-header-overlay p {
+                font-size: 0.8rem; /* Smaller text on mobile */
+                gap: 0.25rem 0.75rem; /* Tighter spacing for stats */
+            }
+            .main-content-block {
+                margin-top: 1rem; /* Less margin on mobile */
+                padding-left: 1rem; /* Adjust padding for smaller screens */
+                padding-right: 1rem;
+            }
+            .lg\:col-span-2, .lg\:col-span-1 {
+                width: 100%; /* Ensure full width on mobile */
+            }
+            .grid-cols-1.md\:grid-cols-2 {
+                grid-template-columns: 1fr; /* Force single column on mobile for these grids */
+            }
+            .sticky-sidebar {
+                position: static; /* Disable sticky on mobile for better flow */
+                margin-top: 2rem; /* Add some space if not sticky */
+            }
+            .swiper-slide img, .swiper-slide video {
+                max-height: 40vh; /* Adjust max height for mobile gallery */
+            }
+            .swiper-thumbs .swiper-slide {
+                height: 60px; /* Smaller thumbnails on mobile */
+            }
+            .swiper-thumbs .swiper-button-prev, .swiper-thumbs .swiper-button-next {
+                width: 24px; /* Smaller navigation buttons */
+                height: 24px;
+                font-size: 0.8rem;
+            }
+            .calendar {
+                font-size: 13px; /* Smaller font for calendar on mobile */
+            }
+            .calendar .month-header {
+                font-size: 1em;
+                padding: 8px 10px;
+            }
+            .calendar .weekdays div, .calendar .days .day-cell {
+                font-size: 0.8em;
+                min-height: 45px; /* Adjust calendar cell height for mobile */
+                padding: 8px 3px;
+            }
+            .flex-col.sm\:flex-row {
+                flex-direction: column; /* Ensure buttons stack on mobile */
+            }
+        }
+
+        /* Chat Modal Styles (Copied from user_dashboard.php) */
+           #chat-modal {
+               position: fixed;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+               display: flex;
+               justify-content: center;
+               align-items: center;
+               z-index: 100; /* Above everything else */
+               opacity: 0; /* Initially hidden */
+               visibility: hidden; /* Initially hidden */
+               transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+           }
+           #chat-modal.open {
+               opacity: 1;
+               visibility: visible;
+           }
+           #chat-modal-content {
+               background-color: #fff;
+               border-radius: 0.75rem; /* rounded-lg */
+               box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+               width: 95%;
+               max-width: 900px; /* Increased max-width for better chat experience */
+               height: 90%;
+               max-height: 700px; /* Increased max-height */
+               display: flex;
+               flex-direction: column;
+               overflow: hidden; /* Ensures internal content stays within bounds */
+           }
+
+           .chat-modal-header {
+               background-color: #f8f8f8; /* Light gray header */
+               padding: 1rem 1.5rem;
+               border-bottom: 1px solid #e5e7eb;
+               font-weight: 600;
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+           }
+
+           .chat-modal-body {
+               flex-grow: 1;
+               display: flex;
+               overflow: hidden; /* Enable scrolling for contacts and messages */
+           }
+
+           .chat-contacts-list {
+               width: 35%; /* Wider contact list */
+               border-right: 1px solid #e5e7eb;
+               overflow-y: auto;
+               padding: 0.5rem;
+               background-color: #fcfcfc; /* Slightly lighter background */
+           }
+
+           .chat-conversation-area {
+               flex-grow: 1;
+               display: flex;
+               flex-direction: column;
+               background-color: #f3f4f6; /* bg-gray-100 */
+           }
+
+           .chat-messages-container {
+               flex-grow: 1;
+               padding: 1rem;
+               overflow-y: auto;
+               display: flex;
+               flex-direction: column;
+               gap: 0.75rem;
+           }
+
+           .chat-input-area {
+               border-top: 1px solid #e5e7eb;
+               padding: 0.75rem 1rem;
+               background-color: #fff;
+               display: flex;
+               gap: 0.5rem;
+               align-items: flex-end; /* Align input and button at bottom */
+           }
+
+           .chat-message-input {
+               flex-grow: 1;
+               border: 1px solid #d1d5db;
+               border-radius: 0.5rem; /* rounded-md */
+               padding: 0.75rem 1rem;
+               font-size: 0.9rem;
+               resize: none; /* Disable manual resize */
+               min-height: 40px; /* Ensure minimum height */
+               line-height: 1.2;
+           }
+
+           .chat-send-button {
+               background-color: #8b1d52; /* Primary color from user_dashboard */
+               color: white;
+               border: none;
+               border-radius: 0.5rem; /* rounded-md */
+               padding: 0.75rem 1.25rem;
+               cursor: pointer;
+               transition: background-color 0.2s ease-in-out;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               flex-shrink: 0; /* Prevent shrinking */
+           }
+           .chat-send-button:hover {
+               background-color: #6f153f; /* Darker shade on hover */
+           }
+
+           .message-bubble {
+               max-width: 75%; /* Slightly smaller for more natural flow */
+               padding: 0.6rem 1rem;
+               border-radius: 1rem; /* More rounded */
+               word-wrap: break-word;
+               font-size: 0.9rem;
+               line-height: 1.4;
+           }
+           .message-bubble.user {
+               background-color: #e0f2fe; /* light-blue-200 */
+               color: #2563eb; /* blue-700 */
+               align-self: flex-end;
+               border-bottom-right-radius: 0.25rem; /* Slightly less rounded on one corner */
+           }
+           .message-bubble.other { /* For client/owner messages */
+               background-color: #f0fdf4; /* light-green-50 */
+               color: #16a34a; /* green-700 */
+               align-self: flex-start;
+               border-bottom-left-radius: 0.25rem;
+           }
+           .message-bubble.bot { /* For AI assistant messages (if included) */
+               background-color: #f3f4f6; /* gray-100 */
+               color: #374151; /* gray-700 */
+               align-self: flex-start;
+               border-bottom-left-radius: 0.25rem;
+           }
+           .message-bubble.loading {
+               background-color: #e0f2fe; /* Light blue for loading */
+               color: #0c4a6e;
+               align-self: flex-start;
+               font-style: italic;
+           }
+           .message-timestamp {
+               font-size: 0.7rem;
+               color: #6b7280; /* gray-500 */
+               margin-top: 0.25rem;
+           }
+
+           .contact-list-item {
+               padding: 0.75rem 1rem;
+               border-bottom: 1px solid #f3f4f6; /* lighter border */
+               cursor: pointer;
+               display: flex;
+               align-items: center;
+               gap: 0.75rem;
+               transition: background-color 0.2s ease-in-out;
+           }
+           .contact-list-item:hover {
+               background-color: #f0f0f0;
+           }
+           .contact-list-item.active {
+               background-color: #ffe4e6; /* light pink for active */
+               font-weight: 600;
+           }
+           .contact-avatar {
+               width: 40px;
+               height: 40px;
+               border-radius: 50%;
+               background-color: #e5e7eb; /* light gray */
+               color: #6b7280; /* gray-500 */
+               display: flex;
+               justify-content: center;
+               align-items: center;
+               font-weight: bold;
+               flex-shrink: 0;
+               text-transform: uppercase;
+           }
+           .contact-name {
+               font-weight: 500;
+               color: #1f2937;
+           }
+           .last-message-snippet {
+               font-size: 0.8rem;
+               color: #4b5563; /* gray-600 */
+               overflow: hidden;
+               white-space: nowrap;
+               text-overflow: ellipsis;
+           }
+
+           /* Responsive adjustments for chat modal */
+           @media (max-width: 768px) { /* md breakpoint */
+               #chat-modal-content {
+                   width: 100%;
+                   height: 100%;
+                   max-width: none;
+                   max-height: none;
+                   border-radius: 0; /* Full screen, no rounded corners */
+               }
+               .chat-modal-body {
+                   flex-direction: column; /* Stack contacts and conversation */
+               }
+               .chat-contacts-list {
+                   width: 100%;
+                   height: 150px; /* Fixed height for contacts on small screens */
+                   border-right: none;
+                   border-bottom: 1px solid #e5e7eb;
+               }
+               .chat-conversation-area {
+                   flex-grow: 1; /* Allow conversation to fill remaining height */
+               }
+               .chat-message-input {
+                   padding: 0.5rem 0.75rem;
+                   font-size: 0.85rem;
+               }
+               .chat-send-button {
+                   padding: 0.5rem 1rem;
+                   font-size: 0.85rem;
+               }
+           }
