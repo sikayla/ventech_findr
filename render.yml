@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: ventech-php
+    env: php
+    plan: free
+    buildCommand: ""
+    startCommand: ""
+    autoDeploy: true
+    envVars:
+      - key: DB_HOST
+        value: your-db-host
+      - key: DB_NAME
+        value: ventech_db
+      - key: DB_USER
+        value: root
+      - key: DB_PASS
+        value: password
