@@ -1,9 +1,10 @@
 <?php
-$host = 'localhost';
-$db = 'ventech_db';
-$user = 'root';
-$pass = '';
+$host = getenv('DB_HOST') ?: 'localhost';
+$db = getenv('DB_NAME') ?: 'ventech_db';
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASS') ?: '';
 $charset = 'utf8mb4';
+
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -14,6 +15,7 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (PDOException $e) {
-    handle_error("Could not connect to the database in db.php: " . $e->getMessage());
+    // Optional: echo or log in dev mode
+    exit("Database connection failed: " . $e->getMessage());
 }
 ?>
