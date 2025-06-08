@@ -277,12 +277,9 @@ function extractPlaceNameFromGoogleMapsUrl($url) {
                 </button>
             </div>
             
-            <div class="flex-shrink-0 w-full max-w-md md:max-w-none md:w-[500px] fade-in">
-                <img
-                    alt="Atome card image showing three credit cards floating on a bright blue background"
-                    class="w-full h-auto object-contain rounded-lg shadow-md transition transform hover:scale-105 duration-300" src="/ventech_locator/images/locations.gif"
-                />
-            </div>
+             <div class="md:w-1/2 w-full">
+            <img alt="Hand holding a tablet displaying a webpage with settings and options" class="w-full h-full object-cover" height="400" src="/ventech_locator/images/locations.gif" width="600"/>
+           </div>
            
         </div>
     </main>
