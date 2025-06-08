@@ -106,86 +106,193 @@ $forgotPasswordLink = 'forgot_password.php'; // Assuming forgot_password.php is 
   />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
-    /* Custom styles for the loading overlay, copied from original client_login.php */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f0f2f5; /* Light grey background */
+    }
+    /* Custom styles for the login form */
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .login-box {
+        background-color: white;
+        border-radius: 1rem; /* rounded-2xl */
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+        overflow: hidden;
+        max-width: 800px;
+        width: 100%;
+    }
+    .left-panel {
+        background-color: #00303f; /* Dark blue-grey */
+        color: white;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .right-panel {
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .social-buttons button {
+        border: 1px solid #00303f;
+        color: #00303f;
+        width: 40px;
+        height: 40px;
+        border-radius: 0.25rem; /* rounded-md */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem; /* text-xs */
+        font-weight: 600; /* font-semibold */
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .social-buttons button:hover {
+        background-color: #00303f;
+        color: white;
+    }
+    input[type="email"],
+    input[type="password"] {
+        background-color: #e2e8f0; /* gray-300 */
+        color: #1a202c; /* black */
+        font-size: 0.875rem; /* text-sm */
+        border-radius: 0.125rem; /* rounded-sm */
+        padding: 0.5rem 0.75rem; /* px-3 py-2 */
+        width: 100%;
+        border: none;
+    }
+    input:focus, textarea:focus, select:focus {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        box-shadow: ring-2 ring-blue-500; /* Example focus ring with blue */
+    }
+    .form-button {
+        background-color: #b5b600; /* Yellow-green */
+        color: white;
+        font-weight: 600; /* font-semibold */
+        font-size: 0.75rem; /* text-xs */
+        border-radius: 0.125rem; /* rounded-sm */
+        padding: 0.5rem 1.5rem; /* px-6 py-2 */
+        margin-top: 0.75rem; /* mt-3 */
+        transition: background-color 0.2s;
+    }
+    .form-button:hover {
+        background-color: #a0a000; /* Darker yellow-green */
+    }
+
+    /* Loading Overlay Styles (from user_login.php, adjusted for consistency) */
     #loading-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(255, 255, 255, 0.8); /* White with transparency */
+        background-color: white; /* White background as seen in the image */
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 9999; /* Ensure it's on top of everything */
-        transition: opacity 0.3s ease-in-out;
-        opacity: 0; /* Start hidden */
-        visibility: hidden; /* Start hidden */
-    }
-
-    #loading-overlay.visible {
-        opacity: 1;
+        z-index: 10000; /* Ensure it's on top of everything */
+        opacity: 1; /* Start visible */
         visibility: visible;
+        transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
     }
 
-    /* Loading Animation Styles */
+    #loading-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+
     .loader-container {
-        text-align: center;
+        display: flex;
+        flex-direction: column; /* Pin above bar */
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 150px; /* Adjust as needed for container size */
+        height: 150px; /* Adjust as needed for container size */
     }
 
     .loader-pin {
-        color: #ff6347; /* Orange color for the pin */
-        font-size: 3rem; /* Adjust size as needed */
-        margin-bottom: 10px;
+        color: #ff5722; /* Orange color from image */
+        font-size: 3.5rem; /* Large pin size */
+        margin-bottom: 15px; /* Space between pin and bar */
+        animation: bounce 1.5s infinite; /* Animation for bouncing */
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-20px);
+        }
+        60% {
+            transform: translateY(-10px);
+        }
     }
 
     .loader-bar {
-        width: 200px; /* Width of the loading bar */
+        width: 80px; /* Length of the bar */
         height: 4px;
-        background-color: #e0e0e0; /* Light gray track */
+        background-color: #f0f0f0; /* Light gray background for the bar */
         border-radius: 2px;
         position: relative;
-        margin: 0 auto; /* Center the bar */
+        overflow: hidden; /* Ensure indicator stays within bounds */
     }
 
     .loader-indicator {
-        width: 10px; /* Size of the moving dot */
-        height: 10px;
-        background-color: #ff6347; /* Orange dot */
-        border-radius: 50%;
         position: absolute;
-        top: -3px; /* Center vertically on the bar */
-        left: 0;
-        animation: moveIndicator 2s infinite ease-in-out; /* Animation */
+        top: 0;
+        left: -20px; /* Start off-screen to the left */
+        width: 20px; /* Size of the moving dot/line */
+        height: 100%;
+        background-color: #ff5722; /* Orange color for the moving indicator */
+        border-radius: 2px;
+        animation: moveIndicator 2s linear infinite; /* Animation for moving */
     }
 
-    /* Keyframes for the animation */
     @keyframes moveIndicator {
-        0% { left: 0; }
-        50% { left: calc(100% - 10px); } /* Move to the end of the bar */
-        100% { left: 0; }
+        0% {
+            left: -20px;
+        }
+        50% {
+            left: 100%;
+        }
+        100% {
+            left: -20px;
+        }
     }
   </style>
 </head>
 <body>
+  <!-- Loading Overlay -->
+  <div id="loading-overlay">
+      <div class="loader-container">
+          <i class="fas fa-map-marker-alt loader-pin"></i>
+          <div class="loader-bar">
+              <div class="loader-indicator"></div>
+          </div>
+      </div>
+  </div>
+
   <div class="flex items-center justify-center bg-white p-6">
     <div class="flex flex-col md:flex-row bg-white rounded-3xl w-full max-w-4xl overflow-hidden">
       <div class="flex flex-col justify-center px-10 py-12 md:w-1/2">
-        <h2 class="font-poppins font-semibold text-2xl mb-6 text-black">Client Login</h2>
+        <h2 class="font-poppins font-semibold text-2xl mb-3">Client Login</h2>
         
-        <div class="flex space-x-3 mb-6">
-          <button aria-label="Login with Google" class="border border-[#00303f] text-[#00303f] rounded-md w-10 h-10 flex items-center justify-center text-xs font-semibold hover:bg-[#00303f] hover:text-white transition">
-            G+
-          </button>
-          <button aria-label="Login with Facebook" class="border border-[#00303f] text-[#00303f] rounded-md w-10 h-10 flex items-center justify-center text-base font-semibold hover:bg-[#00303f] hover:text-white transition">
-            <i class="fab fa-facebook-f"></i>
-          </button>
-          <button aria-label="Login with GitHub" class="border border-[#00303f] text-[#00303f] rounded-md w-10 h-10 flex items-center justify-center text-base font-semibold hover:bg-[#00303f] hover:text-white transition">
-            <i class="fab fa-github"></i>
-          </button>
-          <button aria-label="Login with LinkedIn" class="border border-[#00303f] text-[#00303f] rounded-md w-10 h-10 flex items-center justify-center text-base font-semibold hover:bg-[#00303f] hover:text-white transition">
-            <i class="fab fa-linkedin-in"></i>
-          </button>
+        <div class="flex space-x-3 mb-6 social-buttons">
+          <button aria-label="Login with Google">G+</button>
+          <button aria-label="Login with Facebook"><i class="fab fa-facebook-f"></i></button>
+          <button aria-label="Login with GitHub"><i class="fab fa-github"></i></button>
+          <button aria-label="Login with LinkedIn"><i class="fab fa-linkedin-in"></i></button>
         </div>
         <div class="text-center mb-4">
           <span class="font-poppins font-semibold text-lg text-black">OR</span>
@@ -255,6 +362,11 @@ $forgotPasswordLink = 'forgot_password.php'; // Assuming forgot_password.php is 
             const loginForm = document.getElementById('loginForm');
             const loadingOverlay = document.getElementById('loading-overlay');
 
+            // Show loading overlay immediately when the page starts loading
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('visible');
+            }
+
             if (loginForm && loadingOverlay) {
                 // Show loading overlay when the form is submitted
                 loginForm.addEventListener('submit', function() {
@@ -263,16 +375,35 @@ $forgotPasswordLink = 'forgot_password.php'; // Assuming forgot_password.php is 
             }
         });
 
-        // Hide loading overlay when the page has fully loaded (including after form submission/redirect)
+        // Hide loading overlay with minimum display time
         window.addEventListener('load', function() {
             const loadingOverlay = document.getElementById('loading-overlay');
-            if (loadingOverlay) {
-                loadingOverlay.classList.remove('visible');
-                // Optional: Remove the element from the DOM after transition
-                loadingOverlay.addEventListener('transitionend', function() {
-                     // Check if the overlay is actually hidden before removing
-                    if (!loadingOverlay.classList.contains('visible')) {
-                         loadingOverlay.remove();
+            let minLoadTimePassed = false;
+            let pageFullyLoaded = false;
+
+            // Set a timeout for the minimum 3-second display
+            setTimeout(() => {
+                minLoadTimePassed = true;
+                // If page has already fully loaded AND minimum time has passed, hide it.
+                if (pageFullyLoaded && loadingOverlay) {
+                    loadingOverlay.classList.add('hidden');
+                    loadingOverlay.addEventListener('transitionend', function handler() {
+                        if (loadingOverlay.classList.contains('hidden')) {
+                            loadingOverlay.remove();
+                            loadingOverlay.removeEventListener('transitionend', handler);
+                        }
+                    });
+                }
+            }, 3000); // 3000 milliseconds = 3 seconds
+
+            pageFullyLoaded = true;
+            // If minimum time has already passed, hide it.
+            if (minLoadTimePassed && loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+                loadingOverlay.addEventListener('transitionend', function handler() {
+                    if (loadingOverlay.classList.contains('hidden')) {
+                        loadingOverlay.remove();
+                        loadingOverlay.removeEventListener('transitionend', handler);
                     }
                 });
             }

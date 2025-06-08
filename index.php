@@ -278,7 +278,7 @@ function extractPlaceNameFromGoogleMapsUrl($url) {
             </div>
             
              <div class="md:w-1/2 w-full">
-            <img alt="Hand holding a tablet displaying a webpage with settings and options" class="w-full h-full object-cover" height="400" src="/ventech_locator/images/locations.gif" width="600"/>
+            <img alt="Hand holding a tablet displaying a webpage with settings and options" class="w-full h-full object-cover" height="500" src="/ventech_locator/images/locations.gif" width="700"/>
            </div>
            
         </div>
