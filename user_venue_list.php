@@ -164,7 +164,7 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
             <a href="index.php" class="text-2xl font-bold hover:text-indigo-200 transition-colors">Ventech Locator</a>
             <div class="hidden md:flex space-x-4 md:space-x-6 lg:space-x-8 items-center text-sm md:text-base">
                 <a class="hover:text-yellow-400 transition duration-150 fade-in fade-in-1 font-medium" href="index.php">HOME</a>
-                <a class="hover:text-yellow-400 transition duration-150 fade-in fade-in-2 font-medium" href="user_venue_list.php">VENUE LIST</a>
+
 
                 <?php if ($isLoggedIn): ?>
                     <a class="hover:text-yellow-400 transition duration-150 fade-in fade-in-3 font-medium flex items-center" href="<?= htmlspecialchars($dashboardLink) ?>">
@@ -188,7 +188,7 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
                 <?php else: ?>
                     <div class="relative fade-in fade-in-3">
                         <button class="hover:text-yellow-400 transition duration-150 focus:outline-none font-medium flex items-center" id="signInButton" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-sign-in-alt mr-2"></i> SIGN IN
+                            <i class="fas fa-sign-in-alt mr-2"></i> Register
                         </button>
                         <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden z-30 transition-all duration-300 ease-in-out origin-top-right" id="dropdownMenu" role="menu" aria-orientation="vertical" aria-labelledby="signInButton">
                             <a href="javascript:void(0);" onclick="openUserLoginModal();" class="block px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-colors duration-150 rounded-t-md" role="menuitem">User Login</a>

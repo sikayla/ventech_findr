@@ -335,7 +335,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <div class="mt-8 pt-5 border-t border-gray-200">
                     <button type="submit"
-                            class="block mx-auto max-w-xs flex justify-center items-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-4 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-150 ease-in-out">
+                            class="block mx-auto max-w-xs flex justify-center items-center
+                                   bg-gradient-to-r from-orange-500 to-yellow-600 border border-orange-700
+                                   text-white font-bold py-2.5 px-4 rounded-full
+                                   shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500
+                                   transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl">
                         <i class="fas fa-plus-circle mr-2"></i> Add Venue
                     </button>
                 </div>

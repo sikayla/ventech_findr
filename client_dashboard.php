@@ -270,7 +270,6 @@ $clientProfilePath = '/ventech_locator/client/client_profile.php';
 $reservationManagePath = '/ventech_locator/reservation_manage.php'; // Adjusted for client
 $clientNotificationListPath = '/ventech_locator/client/client_notification_list.php';
 $clientNotificationEndpoint = '/ventech_locator/client/client_notification.php'; // For JS fetch
-$pending_reservations_count = '/ventech_locator/client_dasboard.php';
 
 // Path for venue_display.php and edit_venue.php
 $venueDisplayPath = '/ventech_locator/venue_display.php';
