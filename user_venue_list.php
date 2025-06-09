@@ -17,25 +17,50 @@ if (!isset($pdo) || !$pdo instanceof PDO ) {
     die("Sorry, we're experiencing technical difficulties with the database. Please try again later.");
 }
 
-// **3. Check User Authentication (Optional but recommended for user-specific features)**
-// If this page is accessible to guests, you can remove this block or make it conditional
-if (!isset($_SESSION['user_id'])) {
-    // Redirect to user login page if not logged in. Adjust path if needed.
-    // header("Location: client/client_login.php"); // Adjust path if needed
-    // exit;
-    $loggedInUserId = null; // Set to null if guests can access
-    $loggedInUsername = null;
-} else {
+// **3. Initialize User Session Variables and Check Authentication**
+$isLoggedIn = isset($_SESSION['user_id']);
+$username = '';
+$userRole = ''; // Initialize user role
+$dashboardLink = '#'; // Default link
+$logoutLink = '#'; // Default link
+
+if ($isLoggedIn) {
      $loggedInUserId = $_SESSION['user_id'];
-     // Fetch username for welcome message if needed
+     // Fetch username and role for welcome message and dashboard link
      try {
-         $stmtUser = $pdo->prepare("SELECT username FROM users WHERE id = ?");
+         $stmtUser = $pdo->prepare("SELECT username, role FROM users WHERE id = ?");
          $stmtUser->execute([$loggedInUserId]);
-         $loggedInUsername = $stmtUser->fetchColumn();
+         $userData = $stmtUser->fetch();
+
+         if ($userData) {
+             $username = $userData['username'];
+             $userRole = strtolower($userData['role'] ?? 'guest'); // Default to 'guest' if role is null/missing
+
+             // Determine dashboard link based on role (ADJUST PATHS AS NEEDED)
+             if ($userRole === 'client' || $userRole === 'admin' || $userRole === 'owner') {
+                 $dashboardLink = '/ventech_locator/client_dashboard.php';
+             } else { // Default to user/guest dashboard (or profile page)
+                 $dashboardLink = '/ventech_locator/users/user_profile.php'; // Assuming user profile exists
+             }
+             $logoutLink = '/ventech_locator/client/client_logout.php'; // General logout for all users
+
+         } else {
+             // User ID in session doesn't exist in DB - clear invalid session
+             error_log("Invalid user ID found in session on user_venue_list.php: " . $loggedInUserId);
+             session_unset();
+             session_destroy();
+             $isLoggedIn = false; // Update login status
+             $loggedInUserId = null; // Clear ID
+         }
      } catch (PDOException $e) {
-         error_log("Error fetching username for user ID {$loggedInUserId} in client_map: " . $e->getMessage());
-         $loggedInUsername = 'User'; // Default if fetching fails
+         error_log("Error fetching user data for user ID {$loggedInUserId} in user_venue_list: " . $e->getMessage());
+         $username = 'User'; // Default if fetching fails
+         $isLoggedIn = false; // Assume not properly logged in if data fetch fails
+         $loggedInUserId = null;
      }
+} else {
+    $loggedInUserId = null; // Set to null if guests can access
+    $username = 'Guest'; // Default username for guests
 }
 
 
@@ -121,54 +146,111 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Venue Map</title>
+    <title>Venue Map</link></title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJHoWIiFsp9vF5+RmJMdxG1j97yrHDNHPxmalkGcJA==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZs1Kkgc8PU1cKB4UUplusxX7j35Y==" crossorigin=""></script>
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-     <link rel="stylesheet" href="/ventech_locator/css/client_map.css">
+     <link rel="stylesheet" href="/ventech_locator/css/user_venue_list.css">
 
-    <style>
-       
-    </style>
+    
 </head>
 <body>
 
-    <nav class="bg-white-700 p-4 text-black shadow-lg fixed w-full top-0 z-10">
+    <nav class="bg-indigo-700 p-4 text-white shadow-lg fixed w-full top-0 z-10">
         <div class="container mx-auto flex justify-between items-center">
             <a href="index.php" class="text-2xl font-bold hover:text-indigo-200 transition-colors">Ventech Locator</a>
-            <div class="flex items-center">
-                 <?php if ($loggedInUserId): // Show notification icon only if logged in ?>
-                     <div class="notification-icon-container">
-                         <a href="user_notification_list.php" class="text-black hover:text-indigo-200 transition-colors" title="View Notifications">
-                              <i class="fas fa-bell text-xl"></i>
-                         </a>
-                         <?php if ($unread_notification_count > 0): ?>
-                             <span id="notification-count-badge" class="notification-badge"><?= htmlspecialchars($unread_notification_count) ?></span>
-                         <?php else: ?>
-                             <span id="notification-count-badge" class="notification-badge" style="display: none;">0</span>
-                         <?php endif; ?>
-                     </div>
-                 <?php endif; ?>
+            <div class="hidden md:flex space-x-4 md:space-x-6 lg:space-x-8 items-center text-sm md:text-base">
+                <a class="hover:text-yellow-400 transition duration-150 fade-in fade-in-1 font-medium" href="index.php">HOME</a>
+                <a class="hover:text-yellow-400 transition duration-150 fade-in fade-in-2 font-medium" href="user_venue_list.php">VENUE LIST</a>
 
-                <?php if ($loggedInUserId): ?>
-                     <span class="mr-4 hidden sm:inline text-indigo-100">Welcome, <strong class="font-semibold text-black"><?= htmlspecialchars($loggedInUsername ?? 'User') ?></strong>!</span>
-                     <a href="user_logout.php" class="bg-black text-indigo-700 hover:bg-gray-200 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm flex items-center">
-                         <i class="fas fa-sign-out-alt mr-1"></i> Logout
-                     </a>
+                <?php if ($isLoggedIn): ?>
+                    <a class="hover:text-yellow-400 transition duration-150 fade-in fade-in-3 font-medium flex items-center" href="<?= htmlspecialchars($dashboardLink) ?>">
+                        <i class="fas fa-user-circle mr-2"></i> Welcome, <?= htmlspecialchars($username) ?>!
+                    </a>
+                    <a class="hover:text-yellow-400 transition duration-150 fade-in fade-in-3 font-medium flex items-center" href="<?= htmlspecialchars($logoutLink) ?>">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </a>
+                    <?php if ($loggedInUserId): // Show notification icon only if logged in and desktop view ?>
+                        <div class="notification-icon-container relative">
+                            <a href="user_notification_list.php" class="text-white hover:text-indigo-200 transition-colors" title="View Notifications">
+                                <i class="fas fa-bell text-xl"></i>
+                            </a>
+                            <?php if ($unread_notification_count > 0): ?>
+                                <span id="notification-count-badge" class="notification-badge absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs px-1.5 py-0.5"><?= htmlspecialchars($unread_notification_count) ?></span>
+                            <?php else: ?>
+                                <span id="notification-count-badge" class="notification-badge" style="display: none;">0</span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 <?php else: ?>
-                     <a href="client/client_login.php" class="bg-black text-indigo-700 hover:bg-gray-200 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm mr-2">
-                         <i class="fas fa-sign-in-alt mr-1"></i> Login
-                     </a>
-                     <a href="client/client_register.php" class="bg-indigo-500 text-black hover:bg-indigo-600 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm">
-                         <i class="fas fa-user-plus mr-1"></i> Register
-                     </a>
+                    <div class="relative fade-in fade-in-3">
+                        <button class="hover:text-yellow-400 transition duration-150 focus:outline-none font-medium flex items-center" id="signInButton" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-sign-in-alt mr-2"></i> SIGN IN
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden z-30 transition-all duration-300 ease-in-out origin-top-right" id="dropdownMenu" role="menu" aria-orientation="vertical" aria-labelledby="signInButton">
+                            <a href="javascript:void(0);" onclick="openUserLoginModal();" class="block px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-colors duration-150 rounded-t-md" role="menuitem">User Login</a>
+                            <a href="javascript:void(0);" onclick="openClientLoginModal();" class="block px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-colors duration-150" role="menuitem">Client/Owner Login</a>
+                            <a href="/ventech_locator/admin/login.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-colors duration-150" role="menuitem">Admin Login</a>
+                        </div>
+                    </div>
                 <?php endif; ?>
+            </div>
+
+            <!-- Mobile menu button for small screens -->
+            <div class="md:hidden flex items-center">
+                <?php if ($loggedInUserId): // Show notification icon only if logged in and mobile view ?>
+                    <div class="notification-icon-container relative mr-4">
+                        <a href="user_notification_list.php" class="text-white hover:text-indigo-200 transition-colors" title="View Notifications">
+                            <i class="fas fa-bell text-xl"></i>
+                        </a>
+                        <?php if ($unread_notification_count > 0): ?>
+                            <span id="mobile-notification-count-badge" class="notification-badge absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs px-1.5 py-0.5"><?= htmlspecialchars($unread_notification_count) ?></span>
+                        <?php else: ?>
+                            <span id="mobile-notification-count-badge" class="notification-badge" style="display: none;">0</span>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                <button id="hamburgerButton" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
             </div>
         </div>
     </nav>
+
+    <!-- Mobile Menu Sidebar -->
+    <div id="mobileMenu" class="fixed top-0 right-0 w-64 h-full bg-gray-800 text-white p-6 transform translate-x-full md:hidden transition-transform duration-300 ease-in-out z-50">
+        <button id="closeMobileMenu" class="absolute top-4 right-4 text-white focus:outline-none">
+            <i class="fas fa-times text-2xl"></i>
+        </button>
+        <nav class="flex flex-col space-y-6 mt-12">
+            <a class="text-lg hover:text-yellow-400 transition duration-150 font-medium" href="index.php">HOME</a>
+            <a class="text-lg hover:text-yellow-400 transition duration-150 font-medium" href="user_venue_list.php">VENUE LIST</a>
+            <?php if ($isLoggedIn): ?>
+                <a class="text-lg hover:text-yellow-400 transition duration-150 font-medium flex items-center" href="<?= htmlspecialchars($dashboardLink) ?>">
+                    <i class="fas fa-user-circle mr-2"></i> Welcome, <?= htmlspecialchars($username) ?>!
+                </a>
+                <a class="text-lg hover:text-yellow-400 transition duration-150 font-medium flex items-center" href="<?= htmlspecialchars($logoutLink) ?>">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </a>
+            <?php else: ?>
+                <div class="relative">
+                    <button class="text-lg hover:text-yellow-400 transition duration-150 focus:outline-none font-medium flex items-center w-full text-left" id="mobileSignInButton" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-sign-in-alt mr-2"></i> SIGN IN
+                    </button>
+                    <div class="mt-2 w-full bg-gray-700 rounded-md shadow-lg py-1 hidden transition-all duration-300 ease-in-out origin-top-right" id="mobileDropdownMenu" role="menu" aria-orientation="vertical" aria-labelledby="mobileSignInButton">
+                        <a href="javascript:void(0);" onclick="openUserLoginModal();" class="block px-4 py-2 text-base text-gray-200 hover:bg-yellow-600 hover:text-white transition-colors duration-150 rounded-t-md" role="menuitem">User Login</a>
+                        <a href="javascript:void(0);" onclick="openUserSignupModal();" class="block px-4 py-2 text-base text-gray-200 hover:bg-yellow-600 hover:text-white transition-colors duration-150" role="menuitem">User Signup</a>
+                        <a href="javascript:void(0);" onclick="openClientLoginModal();" class="block px-4 py-2 text-base text-gray-200 hover:bg-yellow-600 hover:text-white transition-colors duration-150" role="menuitem">Client/Owner Login</a>
+                        <a href="/ventech_locator/admin/login.php" class="block px-4 py-2 text-base text-gray-200 hover:bg-yellow-600 hover:text-white transition-colors duration-150" role="menuitem">Admin Login</a>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </nav>
+    </div>
+
 
     <div class="main-content-area">
         <div class="left-sidebar">
@@ -211,6 +293,46 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
 
         <div class="map-container-right">
             <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- User Login Modal -->
+    <div id="userLoginModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button type="button" onclick="closeUserLoginModal()" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl font-bold z-50">
+                ×
+            </button>
+            <iframe id="userLoginIframe" src="" class="modal-iframe" title="User Login Form"></iframe>
+        </div>
+    </div>
+
+    <!-- User Signup Modal -->
+    <div id="userSignupModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button type="button" onclick="closeUserSignupModal()" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl font-bold z-50">
+                ×
+            </button>
+            <iframe id="userSignupIframe" src="" class="modal-iframe" title="User Signup Form"></iframe>
+        </div>
+    </div>
+
+    <!-- Client Login Modal -->
+    <div id="clientLoginModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button onclick="closeClientLoginModal()" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl font-bold z-50">
+                ×
+            </button>
+            <iframe id="clientLoginIframe" src="" class="modal-iframe" title="Client Login Form"></iframe>
+        </div>
+    </div>
+
+    <!-- Client Signup Modal -->
+    <div id="clientSignupModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button onclick="closeClientSignupModal()" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl font-bold z-50">
+                ×
+            </button>
+            <iframe id="clientSignupIframe" src="" class="modal-iframe" title="Client Signup Form"></iframe>
         </div>
     </div>
 
@@ -633,13 +755,21 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
                  })
                  .then( data   =>  {
                       const  badge = document.getElementById('notification-count-badge');
+                      const  mobileBadge = document.getElementById('mobile-notification-count-badge');
                      if (badge) {
                           const  unreadCount = data.count || 0; // Use 0 if count is not provided
                          if (unreadCount > 0) {
                              badge.textContent = unreadCount; // Update the badge text
                              badge.style.display = 'inline-block'; // Show the badge
+                             if (mobileBadge) {
+                                mobileBadge.textContent = unreadCount;
+                                mobileBadge.style.display = 'inline-block';
+                             }
                          } else {
                              badge.style.display = 'none'; // Hide the badge if no unread notifications
+                             if (mobileBadge) {
+                                mobileBadge.style.display = 'none';
+                             }
                          }
                      }
                  })
@@ -647,8 +777,12 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
                      console.error('There was a problem fetching the notification count:', error);
                      // Hide the badge on fetch errors
                       const  badge = document.getElementById('notification-count-badge');
+                      const  mobileBadge = document.getElementById('mobile-notification-count-badge');
                      if (badge) {
                           badge.style.display = 'none';
+                     }
+                     if (mobileBadge) {
+                        mobileBadge.style.display = 'none';
                      }
                  });
          }
@@ -684,6 +818,320 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
                        .replace(/'/g, '&#039;');
          }
 
+        // --- Desktop Sign In Dropdown Logic ---
+        const signInButton = document.getElementById('signInButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        if (signInButton && dropdownMenu) {
+            signInButton.addEventListener('click', function(event) {
+                event.stopPropagation(); // Prevent click from closing immediately
+                dropdownMenu.classList.toggle('hidden');
+                const isExpanded = !dropdownMenu.classList.contains('hidden');
+                signInButton.setAttribute('aria-expanded', isExpanded);
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!dropdownMenu.classList.contains('hidden') && !signInButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                    dropdownMenu.classList.add('hidden');
+                    signInButton.setAttribute('aria-expanded', false);
+                }
+            });
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && !dropdownMenu.classList.contains('hidden')) {
+                    dropdownMenu.classList.add('hidden');
+                    signInButton.setAttribute('aria-expanded', false);
+                    signInButton.focus();
+                }
+            });
+
+            // Optional: Handle keyboard navigation within the dropdown
+            dropdownMenu.addEventListener('keydown', function(event) {
+                const focusableElements = dropdownMenu.querySelectorAll('a');
+                if (focusableElements.length === 0) return;
+
+                const firstElement = focusableElements[0];
+                const lastElement = focusableElements[focusableElements.length - 1];
+                const activeElement = document.activeElement;
+
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    if (activeElement === lastElement || activeElement === dropdownMenu) {
+                        firstElement.focus();
+                    } else {
+                        const nextElement = Array.from(focusableElements).find((el, index, arr) => el === activeElement && arr[index + 1]);
+                        if (nextElement) nextElement.focus();
+                    }
+                } else if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    if (activeElement === firstElement || activeElement === dropdownMenu) {
+                        lastElement.focus();
+                    } else {
+                        const prevElement = Array.from(focusableElements).find((el, index, arr) => el === activeElement && arr[index - 1]);
+                        if (prevElement) prevElement.focus();
+                    }
+                } else if (event.key === 'Home' || event.key === 'PageUp') {
+                    event.preventDefault();
+                    firstElement.focus();
+                } else if (event.key === 'End' || event.key === 'PageDown') {
+                    event.preventDefault();
+                    lastElement.focus();
+                }
+            });
+        }
+
+
+        // --- Mobile Hamburger Menu and Sign In Dropdown Logic ---
+        const hamburgerButton = document.getElementById('hamburgerButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        const mobileSignInButton = document.getElementById('mobileSignInButton');
+        const mobileDropdownMenu = document.getElementById('mobileDropdownMenu');
+
+
+        if (hamburgerButton && mobileMenu && closeMobileMenu) {
+            hamburgerButton.addEventListener('click', function() {
+                mobileMenu.classList.remove('translate-x-full');
+            });
+
+            closeMobileMenu.addEventListener('click', function() {
+                mobileMenu.classList.add('translate-x-full');
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mobileMenu.classList.contains('translate-x-full') &&
+                    !mobileMenu.contains(event.target) &&
+                    !hamburgerButton.contains(event.target)) {
+                    mobileMenu.classList.add('translate-x-full');
+                }
+            });
+
+            // Close mobile menu on Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && !mobileMenu.classList.contains('translate-x-full')) {
+                    mobileMenu.classList.add('translate-x-full');
+                }
+            });
+        }
+
+        // Mobile Sign In dropdown logic
+        if (mobileSignInButton && mobileDropdownMenu) {
+            mobileSignInButton.addEventListener('click', function(event) {
+                event.stopPropagation();
+                mobileDropdownMenu.classList.toggle('hidden');
+                const isExpanded = !mobileDropdownMenu.classList.contains('hidden');
+                mobileSignInButton.setAttribute('aria-expanded', isExpanded);
+            });
+
+            // Close mobile dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mobileDropdownMenu.classList.contains('hidden') &&
+                    !mobileSignInButton.contains(event.target) &&
+                    !mobileDropdownMenu.contains(event.target)) {
+                    mobileDropdownMenu.classList.add('hidden');
+                    mobileSignInButton.setAttribute('aria-expanded', false);
+                }
+            });
+
+            // Close mobile dropdown on Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && !mobileDropdownMenu.classList.contains('hidden')) {
+                    mobileDropdownMenu.classList.add('hidden');
+                    mobileSignInButton.setAttribute('aria-expanded', false);
+                    mobileSignInButton.focus();
+                }
+            });
+        }
+
+        // --- Modal Functions ---
+        const userLoginModal = document.getElementById('userLoginModal');
+        const userLoginIframe = document.getElementById('userLoginIframe');
+        const userSignupModal = document.getElementById('userSignupModal');
+        const userSignupIframe = document.getElementById('userSignupIframe');
+        const clientLoginModal = document.getElementById('clientLoginModal');
+        const clientLoginIframe = document.getElementById('clientLoginIframe');
+        const clientSignupModal = document.getElementById('clientSignupModal');
+        const clientSignupIframe = document.getElementById('clientSignupIframe');
+
+        // Function to open the user login modal
+        window.openUserLoginModal = function(redirectUrl = '') {
+            let src = '/ventech_locator/users/user_login.php';
+            if (redirectUrl) {
+                src += '?redirect=' + encodeURIComponent(redirectUrl);
+            }
+            userLoginIframe.src = src;
+            userLoginModal.classList.add('visible');
+            userLoginModal.classList.remove('hidden');
+            // Hide any other open dropdowns or modals
+            if (dropdownMenu && !dropdownMenu.classList.contains('hidden')) {
+                dropdownMenu.classList.add('hidden');
+                if (signInButton) signInButton.setAttribute('aria-expanded', false);
+            }
+            if (mobileDropdownMenu && !mobileDropdownMenu.classList.contains('hidden')) {
+                mobileDropdownMenu.classList.add('hidden');
+                if (mobileSignInButton) mobileSignInButton.setAttribute('aria-expanded', false);
+            }
+            closeClientLoginModal(); // Close client login if open
+            closeClientSignupModal(); // Close client signup if open
+            closeUserSignupModal(); // Close user signup if open
+        };
+
+        // Function to close the user login modal
+        window.closeUserLoginModal = function() {
+            userLoginModal.classList.remove('visible');
+            userLoginModal.classList.add('hidden');
+            userLoginIframe.src = ''; // Clear iframe content
+        };
+
+        // Function to open the user signup modal
+        window.openUserSignupModal = function() {
+            userSignupIframe.src = '/ventech_locator/users/user_signup.php';
+            userSignupModal.classList.add('visible');
+            userSignupModal.classList.remove('hidden');
+            // Hide any other open dropdowns or modals
+            if (dropdownMenu && !dropdownMenu.classList.contains('hidden')) {
+                dropdownMenu.classList.add('hidden');
+                if (signInButton) signInButton.setAttribute('aria-expanded', false);
+            }
+            if (mobileDropdownMenu && !mobileDropdownMenu.classList.contains('hidden')) {
+                mobileDropdownMenu.classList.add('hidden');
+                if (mobileSignInButton) mobileSignInButton.setAttribute('aria-expanded', false);
+            }
+            closeUserLoginModal(); // Close user login if open
+            closeClientLoginModal(); // Close client login if open
+            closeClientSignupModal(); // Close client signup if open
+        };
+
+        // Function to close the user signup modal
+        window.closeUserSignupModal = function() {
+            userSignupModal.classList.remove('visible');
+            userSignupModal.classList.add('hidden');
+            userSignupIframe.src = ''; // Clear iframe content
+        };
+
+        // Function to open the client login modal
+        window.openClientLoginModal = function() {
+            clientLoginIframe.src = '/ventech_locator/client/client_login.php';
+            clientLoginModal.classList.add('visible');
+            clientLoginModal.classList.remove('hidden');
+            // Hide the dropdown menu if it's open
+            if (dropdownMenu && !dropdownMenu.classList.contains('hidden')) {
+                dropdownMenu.classList.add('hidden');
+                if (signInButton) signInButton.setAttribute('aria-expanded', false);
+            }
+            if (mobileDropdownMenu && !mobileDropdownMenu.classList.contains('hidden')) {
+                mobileDropdownMenu.classList.add('hidden');
+                if (mobileSignInButton) mobileSignInButton.setAttribute('aria-expanded', false);
+            }
+            // Ensure other modals are closed if open
+            closeUserLoginModal(); // Close user login if open
+            closeUserSignupModal(); // Close user signup if open
+            closeClientSignupModal(); // Close client signup if open
+        };
+
+        // Function to close the client login modal
+        window.closeClientLoginModal = function() {
+            clientLoginModal.classList.remove('visible');
+            clientLoginModal.classList.add('hidden');
+            clientLoginIframe.src = ''; // Clear iframe content
+        };
+
+        // Function to open the client signup modal
+        window.openClientSignupModal = function() {
+            clientSignupIframe.src = '/ventech_locator/client/client_signup.php';
+            clientSignupModal.classList.add('visible');
+            clientSignupModal.classList.remove('hidden');
+            // Ensure other modals are closed if open
+            closeUserLoginModal(); // Close user login if open
+            closeUserSignupModal(); // Close user signup if open
+            closeClientLoginModal(); // Close client login if open
+        };
+
+        // Function to close the client signup modal
+        window.closeClientSignupModal = function() {
+            clientSignupModal.classList.remove('visible');
+            clientSignupModal.classList.add('hidden');
+            clientSignupIframe.src = ''; // Clear iframe content
+        };
+
+        // Close user login modal when clicking outside the content
+        userLoginModal.addEventListener('click', function(event) {
+            if (event.target === userLoginModal) {
+                closeUserLoginModal();
+            }
+        });
+
+        // Close user login modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && userLoginModal.classList.contains('visible')) {
+                closeUserLoginModal();
+            }
+        });
+
+        // Close user signup modal when clicking outside the content
+        userSignupModal.addEventListener('click', function(event) {
+            if (event.target === userSignupModal) {
+                closeUserSignupModal();
+            }
+        });
+
+        // Close user signup modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && userSignupModal.classList.contains('visible')) {
+                closeUserSignupModal();
+            }
+        });
+
+        // Close client login modal when clicking outside the content
+        clientLoginModal.addEventListener('click', function(event) {
+            if (event.target === clientLoginModal) {
+                closeClientLoginModal();
+            }
+        });
+
+        // Close client login modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && clientLoginModal.classList.contains('visible')) {
+                closeClientLoginModal();
+            }
+        });
+
+        // Close signup modal when clicking outside the content
+        clientSignupModal.addEventListener('click', function(event) {
+            if (event.target === clientSignupModal) {
+                closeClientSignupModal();
+            }
+        });
+
+        // Close signup modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && clientSignupModal.classList.contains('visible')) {
+                closeClientSignupModal();
+            }
+        });
+
+        // Listen for messages from the iframe (user_login.php, user_signup.php)
+        window.addEventListener('message', function(event) {
+            const message = event.data;
+
+            if (message.type === 'loginSuccess' || message.type === 'signupSuccess') {
+                // Reload the parent page to reflect login/signup status
+                window.location.reload();
+            } else if (message.type === 'loginError' || message.type === 'signupError') {
+                // Optionally display an error message on the parent page
+                const errorMessageBox = document.createElement('div');
+                errorMessageBox.className = 'fixed inset-0 bg-red-600 bg-opacity-50 flex items-center justify-center z-50';
+                errorMessageBox.innerHTML = `
+                    <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+                        <p class="text-lg font-semibold mb-4 text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>Authentication Failed</p>
+                        <p class="text-gray-700 mb-4">${message.error || 'An unexpected error occurred.'}</p>
+                        <button type="button" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600" onclick="this.closest('.fixed').remove();">OK</button>
+                    </div>
+                `;
+                document.body.appendChild(errorMessageBox);
+            }
+        });
 
     </script>
 </body>
