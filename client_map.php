@@ -154,7 +154,7 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
                  <?php endif; ?>
 
                 <?php if ($loggedInUserId): ?>
-                     <span class="mr-4 hidden sm:inline text-indigo-100">Welcome, <strong class="font-semibold text-black"><?= htmlspecialchars($loggedInUsername ?? 'User') ?></strong>!</span>
+                     <span class="mr-4 hidden sm:inline text-black-100">Welcome, <strong class="font-semibold text-black"><?= htmlspecialchars($loggedInUsername ?? 'User') ?></strong>!</span>
                      <a href="user_logout.php" class="bg-black text-indigo-700 hover:bg-gray-200 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm flex items-center">
                          <i class="fas fa-sign-out-alt mr-1"></i> Logout
                      </a>
