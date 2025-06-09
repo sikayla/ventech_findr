@@ -131,18 +131,224 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
      <link rel="stylesheet" href="/ventech_locator/css/client_map.css">
 
     <style>
-       
+        body {
+            font-family: 'Inter', sans-serif; /* Consistent font with other pages */
+            background-color: #f8f8f8; /* Light background */
+            color: #333;
+        }
+
+        /* Styling for navigation */
+        nav {
+            background-color: #fff; /* White background for header */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 1.5rem; /* Increased padding */
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000; /* Ensure nav is always on top */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a {
+            color: #000; /* Black text for links */
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: #555; /* Darker on hover */
+        }
+
+        /* Main layout for sidebar and map */
+        .main-content-area {
+            display: flex;
+            flex-direction: column; /* Default for mobile */
+            padding-top: 6rem; /* Adjusted to push content below fixed nav */
+            min-height: 100vh; /* Minimum height to fill viewport */
+        }
+
+        @media (min-width: 768px) { /* Tablet and desktop */
+            .main-content-area {
+                flex-direction: row;
+                padding-top: 4.5rem; /* Smaller padding-top for desktop as nav might be less tall */
+            }
+        }
+
+        .left-sidebar {
+            width: 100%; /* Full width on mobile */
+            max-height: 50vh; /* Limit height on mobile */
+            overflow-y: auto; /* Enable scrolling for sidebar content */
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            background-color: white;
+            z-index: 5; /* Below map, but above main content */
+            border-bottom: 1px solid #eee; /* Separator for mobile */
+        }
+
+        @media (min-width: 768px) {
+            .left-sidebar {
+                width: 350px; /* Fixed width for sidebar on desktop */
+                min-width: 300px; /* Ensure it doesn't get too small */
+                max-height: calc(100vh - 4.5rem); /* Adjust height for desktop, based on new nav height */
+                padding: 1rem; /* Revert to normal padding */
+                border-bottom: none; /* No separator on desktop */
+            }
+        }
+
+        #map {
+            height: 60vh; /* Map takes more height on mobile */
+            width: 100%;
+            flex-grow: 1; /* Allow map to grow */
+        }
+
+        @media (min-width: 768px) {
+            #map {
+                height: calc(100vh - 4.5rem); /* Fill remaining height on desktop */
+                flex-grow: 1;
+            }
+        }
+        .map-container-right {
+            flex-grow: 1;
+            position: relative; /* For map controls or popups */
+        }
+
+        /* Filter container */
+        #filter-container {
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1rem; /* Space between filter and list */
+            /* Removed position sticky and top for better flow with fixed nav */
+            z-index: 2; /* Ensure it's above list items */
+        }
+
+        /* Search input specific styles */
+        #venue-search {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.375rem; /* rounded-md */
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.5;
+            margin-top: 0.5rem; /* Added margin for spacing */
+        }
+
+        /* Amenities filter */
+        .amenity-filter {
+            font-size: 0.875rem;
+            color: #4b5563;
+            display: flex; /* Arrange checkboxes inline */
+            flex-wrap: wrap; /* Wrap on smaller screens */
+            gap: 0.75rem; /* Space between items */
+            margin-bottom: 1rem; /* Added margin for spacing */
+            padding-top: 0.5rem; /* Small padding top for visual separation */
+        }
+        .amenity-filter label {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Venue list container */
+        #venue-list-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        /* Venue card styles */
+        .venue-card-list {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease-in-out;
+        }
+        .venue-card-list:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .venue-card-list img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .venue-card-list .card-content {
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .venue-card-list .card-content h3 {
+            margin-bottom: 0.5rem;
+        }
+        .venue-card-list .card-content p {
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+        .venue-card-list .card-content .price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-top: 0.5rem;
+        }
+        .venue-card-list .card-content a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .venue-card-list .card-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* Specific button style for popups - removed for global apply filters */
+        .popup-venue-card .bg-indigo-600 {
+            background-color: #4f46e5;
+        }
+        .popup-venue-card .bg-indigo-600:hover {
+            background-color: #4338ca;
+        }
+        /* General button styling */
+        button {
+            cursor: pointer;
+        }
+
+        /* Custom styles for notification badge */
+        .notification-icon-container {
+             position : relative;
+             display : inline-block;
+             margin-right : 1rem; /* Space between notification icon and logout */
+        }
+
+        .notification-badge {
+             position : absolute;
+             top : -8px;
+             right : -8px;
+             background-color : #ef4444; /* Red color */
+             color : white;
+             border-radius : 9999px;
+             padding : 0.1rem 0.4rem;
+             font-size : 0.75rem;
+             font-weight : bold;
+             min-width : 1.25rem;
+             text-align : center;
+             line-height : 1;
+        }
+
     </style>
 </head>
 <body>
 
-    <nav class="bg-white-700 p-4 text-black shadow-lg fixed w-full top-0 z-10">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="index.php" class="text-2xl font-bold hover:text-indigo-200 transition-colors">Ventech Locator</a>
+    <nav class="bg-white p-4 text-black shadow-lg fixed w-full top-0 z-1000">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <a href="index.php" class="text-2xl font-bold hover:text-gray-700 transition-colors">Ventech Locator</a>
             <div class="flex items-center">
                  <?php if ($loggedInUserId): // Show notification icon only if logged in ?>
                      <div class="notification-icon-container">
-                         <a href="user_notification_list.php" class="text-black hover:text-indigo-200 transition-colors" title="View Notifications">
+                         <a href="user_notification_list.php" class="text-black hover:text-gray-700 transition-colors" title="View Notifications">
                               <i class="fas fa-bell text-xl"></i>
                          </a>
                          <?php if ($unread_notification_count > 0): ?>
@@ -154,15 +360,15 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
                  <?php endif; ?>
 
                 <?php if ($loggedInUserId): ?>
-                     <span class="mr-4 hidden sm:inline text-black-100">Welcome, <strong class="font-semibold text-black"><?= htmlspecialchars($loggedInUsername ?? 'User') ?></strong>!</span>
-                     <a href="user_logout.php" class="bg-black text-indigo-700 hover:bg-gray-200 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm flex items-center">
+                     <span class="mr-4 hidden sm:inline text-black">Welcome, <strong class="font-semibold text-gray-800"><?= htmlspecialchars($loggedInUsername ?? 'User') ?></strong>!</span>
+                     <a href="user_logout.php" class="bg-black text-white hover:bg-gray-800 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm flex items-center">
                          <i class="fas fa-sign-out-alt mr-1"></i> Logout
                      </a>
                 <?php else: ?>
-                     <a href="client/client_login.php" class="bg-black text-indigo-700 hover:bg-gray-200 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm mr-2">
+                     <a href="client/client_login.php" class="bg-black text-white hover:bg-gray-800 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm mr-2">
                          <i class="fas fa-sign-in-alt mr-1"></i> Login
                      </a>
-                     <a href="client/client_register.php" class="bg-indigo-500 text-black hover:bg-indigo-600 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm">
+                     <a href="client/client_register.php" class="bg-indigo-500 text-white hover:bg-indigo-600 py-1.5 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm">
                          <i class="fas fa-user-plus mr-1"></i> Register
                      </a>
                 <?php endif; ?>
@@ -174,20 +380,23 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
         <div class="left-sidebar">
             <div id="filter-container">
                  <h2 class="text-xl font-bold text-gray-800 mb-4">Filter & Search</h2>
-                <div id="search-container" class="mb-4"> <input type="text" id="venue-search" placeholder="Search by venue name..." class="focus:ring-indigo-500 focus:border-indigo-500">
+                <div id="search-container" class="mb-4">
+                    <input type="text" id="venue-search" placeholder="Search by venue name..." class="focus:ring-indigo-500 focus:border-indigo-500 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
                 </div>
                  <?php if (!empty($uniqueAmenities)): ?>
-                     <div class="amenity-filter mb-4"> <strong>Filter by Amenities:</strong>
+                     <div class="amenity-filter mb-4">
+                        <strong class="block mb-2">Filter by Amenities:</strong>
                          <?php foreach ($uniqueAmenities as $amenity): ?>
-                             <label>
-                                 <input type="checkbox" name="amenity" value="<?php echo htmlspecialchars(strtolower($amenity)); ?>" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
-                                 <?php echo htmlspecialchars(ucfirst($amenity)); ?>
+                             <label class="flex items-center space-x-2">
+                                 <input type="checkbox" name="amenity" value="<?php echo htmlspecialchars(strtolower($amenity)); ?>" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out rounded">
+                                 <span class="text-gray-700"><?php echo htmlspecialchars(ucfirst($amenity)); ?></span>
                              </label>
                          <?php endforeach; ?>
                      </div>
                  <?php endif; ?>
 
-                 <div class="flex items-center justify-between mt-4 mb-4"> <label for="sort-by" class="text-gray-700 text-sm font-medium mr-2">Sort By:</label>
+                 <div class="flex items-center justify-between mt-4 mb-4">
+                    <label for="sort-by" class="text-gray-700 text-sm font-medium mr-2">Sort By:</label>
                      <select id="sort-by" class="border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-1.5 px-3 text-sm flex-grow">
                          <option value="title-asc">Name (A-Z)</option>
                          <option value="title-desc">Name (Z-A)</option>
@@ -227,7 +436,7 @@ if ($loggedInUserId) { // Only fetch if a user is logged in
         // Define the custom icon using the provided pin-red.png image
         // IMPORTANT: Adjust the 'iconUrl' path if 'pin-red.png' is not in the same directory as client_map.php
         const customPinIcon = L.icon({
-            iconUrl: '/ventech_locator/images/pin-mark.png', // Path to your custom pin image
+            iconUrl: '/ventech_locator/images/mark.png', // Path to your custom pin image
             iconSize: [50, 50],    // Size of the icon
             iconAnchor: [16, 32],  // Point of the icon which will correspond to marker's location (bottom center)
             popupAnchor: [0, -32]  // Point from which the popup should open relative to the iconAnchor

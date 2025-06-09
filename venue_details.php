@@ -330,7 +330,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (count($files_to_upload) > $max_allowed_new_images) {
                     $form_errors[] = "You can only upload " . $max_allowed_new_images . " more image(s). Please select fewer files.";
                 } else {
-                    // Reorganize $_FILES for handleMultipleFileUpload to process only the files to upload
+                    // Reorganize $_FILES for handleMultipleFileUpload which expects the $_FILES structure
                     $reorganized_images_for_upload = [
                         'name' => array_column($files_to_upload, 'name'),
                         'type' => array_column($files_to_upload, 'type'),
@@ -493,12 +493,24 @@ try {
     <title>Edit Venue: <?php echo htmlspecialchars($venue['title']); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Updated Google Font link to include Roboto Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="/ventech_locator/css/venue_details.css">
     <style>
-      
+        /* Updated body font-family to Roboto Mono */
+        body {
+            font-family: 'Roboto Mono', monospace;
+        }
+        /* Ensure price input padding is sufficient for the symbol */
+        #price {
+            padding-left: 2.25rem !important; /* Adjust this value as needed, 0.5rem = 8px, so pl-9 = 36px */
+        }
+        /* Ensure the currency symbol does not block clicks on the input itself */
+        .relative .absolute {
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-900">
@@ -566,7 +578,7 @@ try {
                                     <label for="price" class="block text-sm">Price (per Hour):</label>
                                     <div class="relative">
                                          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">₱</span>
-                                         <input type="number" id="price" name="price" value="<?php echo htmlspecialchars($venue['price'] ?? 0.00); ?>" min="0" step="0.01" class="pl-7" required>
+                                         <input type="number" id="price" name="price" value="<?php echo htmlspecialchars($venue['price'] ?? 0.00); ?>" min="0" step="0.01" required>
                                     </div>
                                 </div>
                                  <div>

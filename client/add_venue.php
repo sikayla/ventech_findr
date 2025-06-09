@@ -249,7 +249,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
     <header class="bg-white shadow-sm">
         <div class="max-w-5xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h1 class="text-2xl font-semibold text-gray-800">Add New Venue</h1>
+            <h1 class="text-2xl font-semibold text-gray-800">Add Your Venue</h1>
              <a href="/ventech_locator/client_dashboard.php" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition duration-150 ease-in-out">
                  <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
              </a>
